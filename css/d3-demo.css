@@ -1,0 +1,48 @@
+.demo-reset {
+    text-align: left;
+}
+.demo-code {
+    cursor: pointer;
+}
+
+#demo-box {
+    font-family: Arial;
+    position: fixed;
+    top: 3em;
+    left: 3em;
+    bottom: 3em;
+    right: 3em;
+    padding: 1em;
+    background: white;
+    border: 3px solid silver;
+    box-shadow: 0.2em 0.2em #0000f1;
+    z-index: 200000;
+}
+#demo-box.demo-box-hide {
+    display: none;
+}
+#demo-box-close {
+    position: absolute;
+    top: 0;
+    right: 0.25em;
+    font-size: 4em;
+    vertical-align: top;
+    cursor: pointer;
+}
+.demo-box-clickable {
+    cursor: pointer;
+}
+.demo-box-clickable:hover {
+    color: #002b36;
+}
+#demo-box-close:hover {
+    color: brown;
+}
+#demo-box-header {
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid silver;
+}
+.demo-box-title {
+    font-size: 2em;
+    color: #363636;
+}
