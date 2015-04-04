@@ -85,65 +85,97 @@ demoBoxClear.addEventListener('click', function() {
 });
 
 setupDemo('simple-demo', function (containerElement) {
-    d3.select(containerElement)
-        .selectAll("div")
-        .data(generateSample())
-        .enter()
-        .append("div")
-            .text(function(d) { return d.name; })
-            .style('background', 'red')
-            .style('width', function(d) { return (3*d.value)+ "px" });
-});
-
-setupDemo('simple-transitions', function (containerElement) {
-    var enterTransition = d3.select(containerElement)
-        .selectAll("div")
-        .data(generateSample())
-        .enter()
-            .append("div")
-            .text(function(d) { return d.name; })
-            .style('background', 'red')
-            .style('opacity', 0)
-            .style('width', 0)
-            .transition()
-            .duration(500);
-
-    enterTransition.style('opacity', 1)
-        .style('width', function(d) { return (3*d.value)+ "px"; });
-});
-
-setupDemo('cleaned-up', function(containerElement) {
     var selection = d3.select(containerElement)
         .selectAll("div")
         .data(generateSample());
 
-    var entered = selection.enter()
+    selection.enter()
         .append("div")
             .text(function(d) { return d.name; })
             .style('background', 'red')
-            .style('opacity', 0)
-            .style('width', 0);
+            .style('width', function(d) { return (3*d.value)+ "px" });
 
-    entered
-        .transition()
-        .duration(500)
-        .style('opacity', 1)
-        .style('width', function(d) { return (3 * d.value)+ "px"; });
-}, 1, -1);
+    selection.exit().remove();
+});
+
+setupDemo('simple-demo-binding', function (containerElement) {
+    var selection = d3.select(containerElement)
+        .selectAll("div")
+        .data(generateSample(), function(d) { return d.name; });
+
+    selection.enter()
+        .append("div")
+        .text(function(d) { return d.name; })
+        .style('background', 'red')
+        .style('width', function(d) { return (3*d.value)+ "px" });
+
+    selection.exit().remove();
+}, 1, 4);
+
+setupDemo('enter-exit-transitions', function (containerElement) {
+    var selection = d3.select(containerElement)
+        .selectAll("div")
+        .data(generateSample(), function(d) { return d.name; });
+
+    selection.enter()
+        .append("div")
+            .text(function(d) { return d.name; })
+            .style('background', 'red')
+            .style('opacity', 0.2)
+            .style('width', 0)
+            .transition().duration(500)
+                .style('opacity', 1)
+                .style('width', function(d) { return (3*d.value)+ "px"; });
+
+    selection.exit()
+        .transition().duration(500)
+        .style('opacity', 0)
+        .remove();
+}, 5, -1);
+
+setupDemo('update-transitions-bad', function(containerElement) {
+    var selection = d3.select(containerElement)
+        .selectAll("div")
+        .data(generateSample(), function(d) { return d.name; });
+
+    selection.transition().duration(500)
+        .style('width', function(d) { return (3*d.value)+ "px"; });
+
+    selection.enter()
+        .append("div")
+            .text(function(d) { return d.name; })
+            .style('background', 'red')
+            .style('opacity', 0.2)
+            .style('width', 0)
+            .transition().duration(500)
+                .style('opacity', 1);
+
+    selection.exit()
+        .transition().duration(500)
+        .style('opacity', 0)
+        .remove();
+}, 5, -1);
 
 setupDemo('update-transitions', function(containerElement) {
     var selection = d3.select(containerElement)
         .selectAll("div")
-        .data(generateSample());//, function(d) { return d.name; });
+        .data(generateSample(), function(d) { return d.name; });
 
-    var entered = selection.enter()
+    selection.transition().duration(500)
+        .style('width', function(d) { return (3*d.value)+ "px"; });
+
+    selection.enter()
         .append("div")
-        .text(function(d) { return d.name; })
-        .style('background', 'red')
-        .style('width', 0);
+            .text(function(d) { return d.name; })
+            .style('background', 'red')
+            .style('opacity', 0.2)
+            .style('width', 0)
+            .transition().duration(500)
+                .style('opacity', 1)
+                .style('width', function(d) { return (3*d.value)+ "px"; });
 
-    selection
-        .transition()
-        .duration(500)
-        .style('width', function(d) { return (3 * d.value)+ "px"; });
-});
+    selection.exit()
+        .transition().duration(500)
+            .style('opacity', 0)
+            .remove();
+}, 5, -1);
