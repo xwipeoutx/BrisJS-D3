@@ -49,3 +49,13 @@
     font-size: 2em;
     color: #363636;
 }
+
+/* SVG */
+path {
+    stroke-width: 0.5px;
+    stroke: #303030;
+    fill: none;
+}
+text {
+    fill: #303030;
+}
