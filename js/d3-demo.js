@@ -187,7 +187,7 @@ setupDemo('scale-ordinal-points', function(containerElement) {
     scale('Foo'); // 250
     scale('Bar'); // 750
     scale('Baz'); // 1250
-    scale('Baz'); // 1750
+    scale('Qux'); // 1750
 }, 1);
 
 setupDemo('scale-ordinal-rangeband', function(containerElement) {
@@ -197,7 +197,7 @@ setupDemo('scale-ordinal-rangeband', function(containerElement) {
 
     scale('Foo'); // 100
     scale('Bar'); // 600
-    scale('Baz'); // 110
+    scale('Baz'); // 1100
     scale.rangeBand(); // 400
 }, 1);
 
@@ -242,7 +242,6 @@ setupDemo('demo-bar', function(containerElement) {
     bars.exit()
         .transition().duration(dt())
             .style('opacity', 0)
-            .attr('height', 0)
             .attr('width', 0)
             .remove();
 
@@ -348,7 +347,7 @@ setupDemo('live-loading', function(containerElement) {
         circles.exit().remove();
 
         circles
-            .transition().duration(100).ease('linear')
+            .transition().duration(dt()).ease('linear')
             .attr('cx', function(d) { return xScale(d.time)})
             .attr('cy', function(d) { return yScale(d.value)})
             .style('fill', function(d) { return colorScale(d.status); });
@@ -358,9 +357,9 @@ setupDemo('live-loading', function(containerElement) {
 
         axisGroup.enter().append('g');
         axisGroup
-            .transition().duration(100).ease('linear')
+            .transition().duration(dt()).ease('linear')
             .call(axis);
-    }, 100);
+    }, dt());
 
     onClear.push(function() { clearInterval(intervalId);});
 
@@ -406,6 +405,7 @@ setupDemo('live-loading-path', function(containerElement) {
     var axis = d3.svg.axis()
         .tickFormat(d3.time.format('%H:%M:%S'))
         .ticks(d3.time.seconds, 1)
+        .orient('top')
         .scale(xScale);
 
     var intervalId = setInterval(function() {
