@@ -3,6 +3,7 @@ var demoBoxContents = byId('demo-box-contents');
 var demoBoxRun = byId('demo-box-run');
 var demoBoxClear = byId('demo-box-clear');
 var demoBoxClose = byId('demo-box-close');
+var demoBoxShuffle = byId('demo-box-shuffle');
 
 window.currentRunFunction = null;
 
@@ -24,7 +25,10 @@ function generateSample() {
         randomPerson("Frank")
     ];
     sampleData = sampleData.slice(0, amountToGenerate);
-    shuffle(sampleData);
+
+    if (demoBoxShuffle.checked)
+        shuffle(sampleData);
+
     return sampleData;
 
     function randomPerson(name) {
@@ -193,8 +197,8 @@ setupDemo('demo-bar', function(containerElement) {
     var commitCounts = data.map(function(p) { return p.commits; });
 
     var xScale = d3.scale.linear()
-        .domain([d3.min(commitCounts.concat(0)), d3.max(commitCounts)])
-        .range([100, 600]);
+        .domain([0, d3.max(commitCounts)])
+        .range([0, 450]);
 
     var yScale = d3.scale.ordinal()
         .domain(nameDomain)
@@ -268,7 +272,7 @@ setupDemo('demo-bar', function(containerElement) {
 
     axisGroup.enter().append('g')
         .attr('class', 'x-axis')
-        .attr('transform', 'translate(0, 350)');
+        .attr('transform', 'translate(100, 350)');
 
     axisGroup
         .transition().duration(500)
