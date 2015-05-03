@@ -193,23 +193,23 @@ setupDemo('demo-bar', function(containerElement) {
     var commitCounts = data.map(function(p) { return p.commits; });
 
     var xScale = d3.scale.linear()
-        .domain([d3.min(commitCounts), d3.max(commitCounts)])
+        .domain([d3.min(commitCounts.concat(0)), d3.max(commitCounts)])
         .range([100, 600]);
 
     var yScale = d3.scale.ordinal()
         .domain(nameDomain)
-        .rangeBands([0, 400], 0.2);
+        .rangeBands([0, 350], 0.2);
 
     var colorScale = d3.scale.category10()
         .domain(osDomain);
 
     var svg = d3.select(containerElement)
-        .select('svg');
+        .selectAll('svg')
+        .data(['svg']);
 
-    if (svg.empty())
-        svg = d3.select(containerElement).append('svg')
-            .style('width', 600)
-            .style('height', 400);
+    svg.enter().append('svg')
+        .style('width', 600)
+        .style('height', 400);
 
     var bars = svg
         .selectAll('rect.person')
@@ -258,4 +258,19 @@ setupDemo('demo-bar', function(containerElement) {
             .style('opacity', 1)
             .attr('y', function(p) { return yScale(p.name) + yScale.rangeBand() / 2; });
 
+    var axis = d3.svg.axis()
+        .scale(xScale)
+        .orient('bottom');
+
+    var axisGroup = svg
+        .selectAll('g.x-axis')
+        .data(['xAxis']);
+
+    axisGroup.enter().append('g')
+        .attr('class', 'x-axis')
+        .attr('transform', 'translate(0, 350)');
+
+    axisGroup
+        .transition().duration(500)
+        .call(axis);
 });
