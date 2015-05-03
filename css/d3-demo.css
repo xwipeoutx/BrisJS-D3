@@ -18,6 +18,9 @@
     box-shadow: 0.2em 0.2em #0000f1;
     z-index: 200000;
 }
+#demo-box-contents {
+    padding: 1em;
+}
 #demo-box.demo-box-hide {
     display: none;
 }
