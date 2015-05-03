@@ -15,13 +15,15 @@
     padding: 1em;
     background: white;
     border: 3px solid silver;
-    box-shadow: 0.2em 0.2em #0000f1;
     z-index: 200000;
 }
 #demo-box-contents {
     padding: 1em;
 }
 #demo-box.demo-box-hide {
+    display: none;
+}
+#demo-box.demo-box-hide ~ * {
     display: none;
 }
 #demo-box-close {
@@ -58,4 +60,8 @@ path {
 }
 text {
     fill: #303030;
+}
+.d3-header path {
+    fill: silver;
+    stroke: none;
 }

@@ -4,6 +4,7 @@ var demoBoxRun = byId('demo-box-run');
 var demoBoxClear = byId('demo-box-clear');
 var demoBoxClose = byId('demo-box-close');
 var demoBoxShuffle = byId('demo-box-shuffle');
+var demoBoxTransitionSpeed = byId('demo-box-transitionSpeed');
 
 window.currentRunFunction = null;
 
@@ -11,7 +12,9 @@ function shuffle(a,b,c,d){//array,placeholder,placeholder,placeholder
     c=a.length;while(c)b=Math.random()*(--c+1)|0,d=a[c],a[c]=a[b],a[b]=d
 }
 function byId(id) { return document.getElementById(id); }
-function rnd(max, min) { return (isNaN(min) ? 20 : min) + Math.floor(Math.random() * (isNaN(max) ? 100 : max) + 0.5); }
+function rnd(max, min) { return (isNaN(min) ? 0 : min) + Math.floor(Math.random() * (isNaN(max) ? 100 : max) + 0.5); }
+
+function dt() { return parseInt(demoBoxTransitionSpeed.value); }
 
 function generateSample() {
     var amountToGenerate = 2 + Math.floor(Math.random()*6);
@@ -87,6 +90,7 @@ function showBox() {
     demoBox.classList.remove('demo-box-hide');
 }
 function hideBox() {
+    clearStuff();
     demoBox.classList.add('demo-box-hide');
     currentRunFunction = null;
 }
@@ -96,9 +100,17 @@ demoBoxRun.addEventListener('click', function() {
     if (currentRunFunction)
         currentRunFunction();
 });
-demoBoxClear.addEventListener('click', function() {
+
+var onClear = [];
+demoBoxClear.addEventListener('click', clearStuff);
+
+function clearStuff() {
+    onClear.forEach(function(c) {
+        c();
+    });
+    onClear = [];
     demoBoxContents.innerHTML = '';
-});
+}
 
 function selectAndBind(containerElement) {
     return d3.select(containerElement)
@@ -146,13 +158,13 @@ setupDemo('data-transitions', function(containerElement) {
         .style('opacity', 0);
 
     selection.exit()
-        .transition().duration(500)
+        .transition().duration(dt())
         .style('opacity', 0)
         .remove();
 
     selection
         .text(function(p) { return p.name + " has " + p.commits + " commits"; })
-        .transition().duration(500)
+        .transition().duration(dt())
         .style('opacity', 1);
 }, 1, -1);
 
@@ -228,14 +240,14 @@ setupDemo('demo-bar', function(containerElement) {
         .style('opacity', 0);
 
     bars.exit()
-        .transition().duration(500)
+        .transition().duration(dt())
             .style('opacity', 0)
             .attr('height', 0)
             .attr('width', 0)
             .remove();
 
     bars
-        .transition().duration(500)
+        .transition().duration(dt())
             .attr('y', function(p) { return yScale(p.name) ; })
             .attr('height', yScale.rangeBand())
             .attr('width', function(p) { return xScale(p.commits); })
@@ -253,12 +265,12 @@ setupDemo('demo-bar', function(containerElement) {
         .style('opacity', 0);
 
     texts.exit()
-        .transition().duration(500)
+        .transition().duration(dt())
             .style('opacity', 0)
             .remove();
 
     texts.text(function(p) { return p.name; })
-        .transition().duration(500)
+        .transition().duration(dt())
             .style('opacity', 1)
             .attr('y', function(p) { return yScale(p.name) + yScale.rangeBand() / 2; });
 
@@ -275,6 +287,219 @@ setupDemo('demo-bar', function(containerElement) {
         .attr('transform', 'translate(100, 350)');
 
     axisGroup
-        .transition().duration(500)
+        .transition().duration(dt())
         .call(axis);
+});
+
+setupDemo('live-loading', function(containerElement) {
+    function currentData() {
+        var delta = rnd(10)-5;
+        return {
+            id: rnd(10000000),
+            time: new Date(),
+            status: delta > 0 ? 'good' : 'bad',
+            value: Math.max(10, Math.min(90, collectedData[collectedData.length-1].value + delta))
+        };
+    };
+
+    var collectedData = [{time: new Date(), status: 'bad', value: 50}];
+
+    var xScale = d3.time.scale()
+        .range([50, 550]);
+
+    var yScale = d3.scale.linear()
+        .domain([100, 0])
+        .range([50, 350]);
+
+    var colorScale = d3.scale.ordinal()
+        .domain(['good', 'bad'])
+        .range(['green', 'red']);
+
+    var svg = d3.select(containerElement)
+        .selectAll('svg')
+        .data(['svg']);
+
+    svg.enter().append('svg')
+        .style('width', 600)
+        .style('height', 400);
+
+    var axis = d3.svg.axis()
+        .tickFormat(d3.time.format('%H:%M:%S'))
+        .ticks(d3.time.seconds, 1)
+        .scale(xScale);
+
+    var intervalId = setInterval(function() {
+        var nextDataPoint = currentData();
+        collectedData.push(nextDataPoint);
+        var maxTime = d3.max(collectedData.map(function(d) { return d.time;}))
+        var minTime = new Date(+maxTime - 5000);
+
+        while (collectedData[0].time < minTime)
+            collectedData.shift();
+
+        xScale.domain([minTime, maxTime]);
+
+        var circles = svg.selectAll('circle')
+            .data(collectedData, function(d) { return d.id; });
+
+        circles.enter()
+            .append('circle')
+            .attr('r', 3)
+        circles.exit().remove();
+
+        circles
+            .transition().duration(100).ease('linear')
+            .attr('cx', function(d) { return xScale(d.time)})
+            .attr('cy', function(d) { return yScale(d.value)})
+            .style('fill', function(d) { return colorScale(d.status); });
+
+        var axisGroup = svg.selectAll('g')
+            .data(['xAxis'])
+
+        axisGroup.enter().append('g');
+        axisGroup
+            .transition().duration(100).ease('linear')
+            .call(axis);
+    }, 100);
+
+    onClear.push(function() { clearInterval(intervalId);});
+
+});
+
+setupDemo('live-loading-path', function(containerElement) {
+    function currentData() {
+        var delta = rnd(10)-5;
+        return {
+            id: rnd(10000000),
+            time: new Date(),
+            value: Math.max(10, Math.min(90, collectedData[collectedData.length-1].value + delta))
+        };
+    };
+
+    var collectedData = [{time: new Date(), status: 'bad', value: 50}];
+
+    var xScale = d3.time.scale()
+        .range([50, 550]);
+
+    var yScale = d3.scale.linear()
+        .domain([100, 0])
+        .range([50, 350]);
+
+    var svg = d3.select(containerElement)
+        .selectAll('svg')
+        .data(['svg']);
+
+    svg.enter().append('svg')
+        .style('width', 600)
+        .style('height', 400);
+
+    var path = svg
+        .selectAll('path')
+        .data([collectedData]);
+
+    path.enter().append('path');
+
+    var pathTransform = d3.svg.line()
+        .x(function(d) { return xScale(d.time)})
+        .y(function(d) { return yScale(d.value)});
+
+    var axis = d3.svg.axis()
+        .tickFormat(d3.time.format('%H:%M:%S'))
+        .ticks(d3.time.seconds, 1)
+        .scale(xScale);
+
+    var intervalId = setInterval(function() {
+        var nextDataPoint = currentData();
+        collectedData.push(nextDataPoint);
+        var maxTime = d3.max(collectedData.map(function(d) { return d.time;}))
+        var minTime = new Date(+maxTime - 5000);
+
+        while (collectedData[0].time < minTime)
+            collectedData.shift();
+
+        xScale.domain([minTime, maxTime]);
+
+        path
+            .transition().duration(dt()).ease('linear')
+            .attr('d', pathTransform);
+
+        var axisGroup = svg.selectAll('g')
+            .data(['xAxis'])
+
+        axisGroup.enter().append('g');
+        axisGroup
+            .transition().duration(dt()).ease('linear')
+            .call(axis);
+    }, dt());
+
+    onClear.push(function() { clearInterval(intervalId);});
+
+});
+
+setupDemo('leaflet', function(containerElement) {
+    containerElement.style.height = '600px';
+    var map = L.map(containerElement).setView([-30.3, 140], 4);
+
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var svg = d3.select(map.getPanes().overlayPane).append("svg"),
+        g = svg.append("g").attr("class", "leaflet-zoom-hide");
+
+    d3.csv("data/cyclones.csv", function(data) {
+        var cycloneMap = {};
+        for (var i=0; i < data.length; i++) {
+            var point = data[i];
+            cycloneMap[point.Id] = cycloneMap[point.Id] || { id: point.Id, name: point.Name, points: [] };
+            cycloneMap[point.Id].points.push({
+                lat: parseFloat(point.LAT),
+                lon: parseFloat(point.LON),
+                severity: parseInt(point.SURFACE_CODE),
+                time: new Date(point.Time)
+            });
+        }
+
+        var transform = d3.svg.line()
+            .tension(0)
+            .x(function(d) { return projectPoint(d.lon, d.lat).x; })
+            .y(function(d) { return projectPoint(d.lon, d.lat).y; });
+
+        function projectPoint(lon, lat) {
+            return map.latLngToLayerPoint(new L.LatLng(lat, lon));
+        }
+
+        var cyclones = Object.keys(cycloneMap)
+            .map(function(id) { return cycloneMap[id]; });
+
+        var cyclonePaths = g.selectAll('path')
+            .data(cyclones.slice(0, dt()/10), function(c) { return c.id; })
+
+        cyclonePaths.enter().append('path');
+        cyclonePaths.exit().remove();
+
+        cyclonePaths
+            .style('stroke', 'red')
+            .style('stroke-width', 2);
+
+        map.on('viewreset', reset);
+        reset();
+
+        function reset() {
+            cyclonePaths.attr('d', function(c) { return transform(c.points); } );
+
+            g.attr("transform", null);
+
+            var bounds = g.node().getBBox();
+
+            svg.attr("width", bounds.width)
+                .attr("height", bounds.height)
+                .style("left", bounds.x)
+                .style("top", bounds.y);
+
+            g.attr("transform", "translate(" + -bounds.x + "," + -bounds.y + ")");
+        }
+    });
+
+    onClear.push(function() { map.remove(); containerElement.style.height = ''; });
 });

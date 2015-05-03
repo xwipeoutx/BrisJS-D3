@@ -21,6 +21,8 @@
 		<link rel="stylesheet" href="lib/css/zenburn.css">
 
         <link rel="stylesheet" href="css/d3-demo.css">
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 
 		<!-- Printing and PDF exports -->
 		<script>
@@ -49,7 +51,7 @@
                     <section>
                         <h2>
                             <!-- SVG from site -->
-                            <svg width="96" height="91" style="position:relative;top:22px;">
+                            <svg width="96" height="91" style="position:relative;top:22px;" class="d3-header">
                                 <linearGradient id="logo-gradient-1" gradientUnits="userSpaceOnUse" x1="37.2417" y1="7.0552" x2="97.9669" y2="67.7803">
                                     <stop offset="0" stop-color="#F9A03C"></stop>
                                     <stop offset="1" stop-color="#F7974E"></stop>
@@ -231,91 +233,44 @@
                     </section>
                 </section>
 
+
+
                 <section>
                     <section>
-                        <pre><code>var figures = [
-    { "name": "Triangle", "numPoints": 3, "perimeterRatio": 4.55 },
-    { "name": "Square", "numPoints": 4, "perimeterRatio": 4 },
-    { "name": "Pentagon", "numPoints": 5, "perimeterRatio": 3.81 },
-    { "name": "Hexagon", "numPoints": 6, "perimeterRatio": 3.72 }
-];</code></pre>
+                        <h1>Time and updates</h1>
                     </section>
 
                     <section>
-                        <h2>Simple Demo</h2>
-                        <div id="simple-demo"></div>
+                        <h2>Real time</h2>
+                        <div id="live-loading"></div>
                     </section>
 
                     <section>
-                        <h2>Binding</h2>
-                        <div id="simple-demo-binding"></div>
+                        <h2>Using &lt;path&gt;</h2>
+                        <div id="live-loading-path"></div>
                     </section>
 
                     <section>
-                        <h2>Enter/Exit Transitions</h2>
-                        <div id="enter-exit-transitions"></div>
-                    </section>
-
-                    <section>
-                        <h2>Update Transitions</h2>
-                        <p>Only the latest applied transition will apply</p>
-                    </section>
-
-                    <section>
-                        <h2>Update Transitions - Bad</h2>
-                        <div id="update-transitions-bad"></div>
-                    </section>
-
-                    <section>
-                        <h2>And more...</h2>
-                        <ul>
-                            <li>.ease(easing) - specify transition timing</li>
-                            <li>.tween(fn) - specify tweening function for custom interpolation</li>
-                            <li>.delay(ms) - add delays to transition</li>
-                        </ul>
+                        <h2>Oh dear!</h2>
+                        <iframe src="http://bost.ocks.org/mike/path/" style="width: 800px; height: 400px; background: white;" >
+                        </iframe>
                     </section>
                 </section>
 
                 <section>
                     <section>
-                        <h1>Interpolation</h1>
+                        <h1>Maps</h1>
+                    </section>
+
+                    <section>
+                        <h2>Leaflet + D3 = dream</h2>
+                        <div id="leaflet"></div>
                     </section>
                 </section>
 
                 <section>
                     <section>
-                        <h1>Scales</h1>
-                    </section>
-                </section>
-
-                <section>
-                    <section>
-                        <h1>Axes</h1>
-                    </section>
-                </section>
-
-                <section>
-                    <section>
-                        <h1>Time</h1>
-                    </section>
-                </section>
-
-                <section>
-                    <section>
-                        <h1>Colors</h1>
-                    </section>
-                </section>
-
-                <section>
-                    <section>
-                        <h1>SVG</h1>
-                    </section>
-                </section>
-
-
-                <section>
-                    <section>
-                        <h1>Layouts</h1>
+                        <h1>?</h1>
                     </section>
                 </section>
 		</div>
@@ -330,6 +285,8 @@
                 <span id="demo-box-clear" class="demo-box-clickable">Clear</span>
                 ::
                 <label><input type="checkbox" checked value="1" id="demo-box-shuffle">Shuffle</label>
+                ::
+                <label>dt <input type="text" value="500" id="demo-box-transitionSpeed" size="4"></label>
             </div>
             <div id="demo-box-contents"></div>
             <span id="demo-box-close" class="demo-box-clickable">×</span>
